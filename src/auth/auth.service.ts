@@ -130,7 +130,7 @@ export class AuthService {
             const options: SendMailOptions = {
                 from: transporter.email,
                 to: email,
-                subject: 'Heart Hand: Verify you account',
+                subject: 'CineVerse: Verify you account',
                 html: ejs.render(otpTemplate(name || 'User', otp, expires_in)),
             };
             await this.notificationService.sendMail(
@@ -165,7 +165,7 @@ export class AuthService {
             const options: SendMailOptions = {
                 from: transporter.email,
                 to: email,
-                subject: 'Heart Hand: Verify you account',
+                subject: 'Cine Verse: Verify you account',
                 html: ejs.render(
                     forget_password_otp_template(name || 'User', otp, expires_in),
                 ),
