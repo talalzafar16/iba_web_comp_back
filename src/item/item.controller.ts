@@ -61,5 +61,18 @@ export class ItemController {
     async deleteItem(@Param('id') id: string, @Req() req: UserPayloadRequest) {
         return this.itemService.deleteItem(id, req.user['id']);
     }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Patch(':id/like')
+    async toggleLikeItem(@Param('id') id: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.toggleLikeItem(id, req.user.id);
+    }
+
+
+    @Patch(':id/download')
+    async incrementDownloads(@Param('id') id: string) {
+        return this.itemService.incrementDownloads(id);
+    }
 }
 

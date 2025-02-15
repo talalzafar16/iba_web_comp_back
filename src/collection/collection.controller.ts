@@ -58,5 +58,19 @@ export class CollectionController {
     async deleteCollection(@Param('id') id: string, @Req() req: UserPayloadRequest) {
         return this.collectionService.deleteCollection(id, req.user['id']);
     }
+
+    @ApiBearerAuth()
+    @Patch(':id/like')
+    @UseGuards(AuthGuard) // Ensure only authenticated users can like/unlike
+    async toggleLike(@Param('id') id: string, @Req() req: UserPayloadRequest) {
+        return this.collectionService.toggleLikeCollection(id, req.user.id);
+    }
+
+    @Patch(':id/download')
+    async incrementDownloads(@Param('id') id: string) {
+        return this.collectionService.incrementDownloads(id);
+    }
+
+
 }
 

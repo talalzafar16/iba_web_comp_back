@@ -49,16 +49,16 @@ export class ItemService {
             if (!collection.isPublic) throw new BadRequestException("Its a private collection")
 
             query = collectionId ? { parent_collection: new Types.ObjectId(collectionId) } : {};
-        }else {
-            const collection_ids = (await this.collectionModel.find({isPublic :true})).map(col => col._id)
-            query = { parent_collection : { $in : collection_ids} }
+        } else {
+            const collection_ids = (await this.collectionModel.find({ isPublic: true })).map(col => col._id)
+            query = { parent_collection: { $in: collection_ids } }
         }
         const skip = (page_no - 1) * DEFAULT_LIMIT
         return this.itemModel.find(query).skip(skip).limit(DEFAULT_LIMIT).populate('creator', 'name').exec();
     }
 
 
-    async getItemById(id: string, user_id:string): Promise<Item> {
+    async getItemById(id: string, user_id: string): Promise<Item> {
         const item = await this.itemModel.findById(id).populate('creator', 'name');
         if (!item) throw new NotFoundException('Item not found');
         if (item.creator.toString() !== user_id) throw new BadRequestException("Item not found")
@@ -97,5 +97,33 @@ export class ItemService {
         await this.itemModel.findByIdAndDelete(id);
         return { message: 'Item deleted successfully' };
     }
+
+    async toggleLikeItem(itemId: string, userId: string): Promise<{ message: string }> {
+        const item = await this.itemModel.findById(itemId);
+        if (!item) throw new NotFoundException('Item not found');
+
+        const userIndex = item.likes.map(u=> u.toString()).indexOf(userId);
+        if (userIndex === -1) {
+            item.likes.push(new Types.ObjectId(userId)); 
+            await item.save();
+            return { message: 'Item liked' };
+        } else {
+            item.likes.splice(userIndex, 1); 
+            await item.save();
+            return { message: 'Item unliked' };
+        }
+    }
+
+    async incrementDownloads(itemId: string): Promise<{ message: string }> {
+        const item = await this.itemModel.findById(itemId);
+        if (!item) throw new NotFoundException('item not found');
+
+        item.downloads += 1; 
+        await item.save();
+
+        return { message: 'Download count updated' };
+    }
+
+
 }
 

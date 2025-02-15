@@ -93,5 +93,37 @@ export class CollectionService {
 
         await collection.deleteOne();
     }
+
+    async toggleLikeCollection(collectionId: string, userId: string): Promise<{ message: string }> {
+        const collection = await this.collectionModel.findById(collectionId);
+        if (!collection) throw new NotFoundException('Collection not found');
+
+        const likeIndex = collection.likes.map(u => u.toString()).indexOf(userId);
+
+        if (likeIndex === -1) {
+            // User has not liked it yet → Add like
+            collection.likes.push(new Types.ObjectId(userId));
+        } else {
+            // User already liked it → Remove like
+            collection.likes.splice(likeIndex, 1);
+        }
+
+        await collection.save();
+
+        return { message: likeIndex === -1 ? 'Collection liked' : 'Like removed' };
+    }
+
+    async incrementDownloads(collectionId: string): Promise<{ message: string }> {
+        const collection = await this.collectionModel.findById(collectionId);
+        if (!collection) throw new NotFoundException('Collection not found');
+        if (!collection.isPublic) throw new BadRequestException("Cant download private collection!")
+
+        collection.downloads += 1; // Increment downloads count
+        await collection.save();
+
+        return { message: 'Download count updated' };
+    }
+
+
 }
 
