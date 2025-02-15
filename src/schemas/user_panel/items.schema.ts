@@ -40,6 +40,10 @@ export class Item extends Document {
 
   @Prop({ type: String, enum: PlanType })
   plan: PlanType;
+
+  @Prop({ type: Number, required: false, default:0})
+  price: number;
+
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

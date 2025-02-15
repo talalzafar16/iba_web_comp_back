@@ -105,6 +105,11 @@ export class ItemService {
         return item;
     }
 
+    async findById(id: string): Promise<Item> {
+        const item = await this.itemModel.findById(id)
+        return item;
+    }
+
 
     async getItemByIdPublic(id: string): Promise<Item> {
         const item = await this.itemModel.findById(id).populate('creator', 'name');

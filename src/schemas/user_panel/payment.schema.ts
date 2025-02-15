@@ -2,29 +2,33 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from "./user.schema"
 import { Item } from "./items.schema"
+import { Collection } from './collection.schema';
 
 @Schema({ timestamps: true })
 export class Payment extends Document {
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  buyer: Types.ObjectId; // User who purchased
+  buyer: Types.ObjectId; 
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  seller: Types.ObjectId; // Owner of the item
+  seller: Types.ObjectId; 
 
   @Prop({ type: Types.ObjectId, ref: Item.name, required: true })
-  item: Types.ObjectId; // Purchased item
+  item: Types.ObjectId; 
+
+  @Prop({ type: Types.ObjectId, ref: Collection.name, required: true })
+  item_collection: Types.ObjectId; 
 
   @Prop({ required: true })
-  amount: number; // Payment amount
+  amount: number; 
 
   @Prop({ required: true })
-  currency: string; // Currency (e.g., USD)
+  currency: string; 
 
   @Prop({ required: true })
-  stripeInvoiceId: string; // Stripe Invoice ID
+  stripeInvoiceId: string; 
 
   @Prop({ default: 'pending', enum: ['pending', 'completed', 'failed'] })
-  status: string; // Payment status
+  status: string; 
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
