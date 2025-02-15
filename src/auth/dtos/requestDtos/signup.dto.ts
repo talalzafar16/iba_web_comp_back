@@ -1,24 +1,44 @@
-import { IsEmail, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator'
+import { OmitType, PartialType } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
-export class SignUpDto {
+export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  name: string
+  name: string;
 
   @IsEmail()
-  email: string
+  email: string;
 
   @IsString()
   @IsNotEmpty()
-  country: string
+  country: string;
 
   @IsNotEmpty()
   @IsInt()
   @Min(3)
   @Max(150)
-  age: number
+  age: number;
 
   @IsNotEmpty()
   @IsString()
-  password: string
+  password: string;
+}
+
+export class UpdateUserDtoClient extends PartialType(
+  OmitType(CreateUserDto, ['password'] as const),
+) {}
+
+export class UpdateUserDtoDB extends PartialType(CreateUserDto) {
+  @IsBoolean()
+  @IsOptional()
+  is_email_verified?: boolean;
 }
