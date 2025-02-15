@@ -25,6 +25,21 @@ export class User {
 
   @Prop({ type: Boolean , default: false, required: true })
   is_email_verified: boolean;
+
+  @Prop({ type: String, default: '' })
+  profileImage: string;
+
+  @Prop({ type: String, maxlength: 500 })
+  bio: string;
+
+  @Prop({ type: String })
+  website: string;
+
+  @Prop({ type: String })
+  location: string;
+
+  @Prop({ type: [String] })
+  skills: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
