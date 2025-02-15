@@ -1,4 +1,8 @@
-export const forget_password_otp_template = (name: string, otp: string, expiresIn: number) => {
+export const forget_password_otp_template = (
+  name: string,
+  otp: string,
+  expiresIn: number,
+) => {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -78,8 +82,8 @@ export const forget_password_otp_template = (name: string, otp: string, expiresI
   </div>
 </body>
 </html>
-    `
-}
+    `;
+};
 
 export const otpTemplate = (name: string, otp: string, expiresIn: number) => {
   return `
@@ -161,5 +165,5 @@ export const otpTemplate = (name: string, otp: string, expiresIn: number) => {
   </div>
 </body>
 </html>
-    `
-}
+    `;
+};

@@ -1,4 +1,5 @@
 export interface UserPayload {
-  id: number
-  email: string
+  id: string;
+  email: string;
+  is_email_verified: boolean
 }

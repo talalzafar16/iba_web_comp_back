@@ -1,9 +1,9 @@
 // @ts-nocheck
 export class SuccessResDto {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
 
   constructor(obj: SuccessResDto) {
-    Object.assign(this, obj)
+    Object.assign(this, obj);
   }
 }

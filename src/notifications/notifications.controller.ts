@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common'
+import { Controller } from '@nestjs/common';
 //import { NotificationsService } from './notifications.service';
 //import { EmailTransporter} from './classes/transporter.class';
 //import { otpTemplate } from './templates/otp.template';

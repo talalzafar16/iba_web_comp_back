@@ -1,11 +1,15 @@
-import { Transporter as NmTransporter, createTransport, TransportOptions } from 'nodemailer'
+import {
+  Transporter as NmTransporter,
+  createTransport,
+  TransportOptions,
+} from 'nodemailer';
 
 export class EmailTransporter {
-  defaultTransporter: NmTransporter
-  email!: string
+  defaultTransporter: NmTransporter;
+  email!: string;
 
   constructor() {
-    this.defaultTransporter = this.createGmailTransporter()
+    this.defaultTransporter = this.createGmailTransporter();
   }
 
   private createGmailTransporter() {
@@ -15,10 +19,10 @@ export class EmailTransporter {
         user: process.env.EMAIL,
         pass: process.env.GMAIL_APP_PASSWORD,
       },
-    } as TransportOptions)
+    } as TransportOptions);
 
-    this.email = process.env.EMAIL || 'flint.teams@gmail.com'
+    this.email = process.env.EMAIL || 'flint.teams@gmail.com';
 
-    return transporter
+    return transporter;
   }
 }

@@ -1,19 +1,19 @@
 // @ts-nocheck
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class ResetPasswordReqDto {
   @IsEmail()
-  email: string
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  password: string
+  password: string;
 
   @IsNotEmpty()
   @IsString()
-  confirm_password: string
+  confirm_password: string;
 
   @IsNotEmpty()
   @IsString()
-  reset_password_token: string
+  reset_password_token: string;
 }

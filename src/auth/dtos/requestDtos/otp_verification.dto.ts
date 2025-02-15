@@ -1,14 +1,16 @@
 // @ts-nocheck
-import { OmitType } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { OmitType } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class VerifyEmailByOtpRequest {
   @IsEmail()
-  email: string
+  email: string;
 
   @IsNotEmpty()
   @IsString()
-  otp: string
+  otp: string;
 }
 
-export class SendOtpReqDto extends OmitType(VerifyEmailByOtpRequest, ['otp'] as const) {}
+export class SendOtpReqDto extends OmitType(VerifyEmailByOtpRequest, [
+  'otp',
+] as const) {}
