@@ -29,6 +29,12 @@ export class CollectionController {
     return this.collectionService.getUserCollections(req.user['id'],page_no);
   }
 
+
+  @Get(':id/public')
+  async getCollectionByIdPublic(@Param('id') id: string) {
+    return this.collectionService.getCollectionByIdPublic(id);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
