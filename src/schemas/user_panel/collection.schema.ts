@@ -1,11 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
 import { User } from './user.schema';
 
 export enum PlanType {
   BASIC = 'basic',
   PREMIUM = 'premium',
 }
+
+  export type CollectionDocument = HydratedDocument<Collection>;
 
 @Schema({ timestamps: true })
 export class Collection extends Document {

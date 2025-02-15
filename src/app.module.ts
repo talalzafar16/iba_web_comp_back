@@ -15,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NgoController } from './ngo/ngo.controller';
 import { NgoModule } from './ngo/ngo.module';
 import { CollectionModule } from './collection/collection.module';
+import { ItemModule } from './item/item.module';
 
 @Module({
     imports: [
@@ -38,6 +39,7 @@ import { CollectionModule } from './collection/collection.module';
         UserModule,
         NgoModule,
         CollectionModule,
+        ItemModule,
     ],
     controllers: [AppController, AuthController, NgoController],
     providers: [
