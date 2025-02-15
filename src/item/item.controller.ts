@@ -12,6 +12,7 @@ import { isArray } from 'class-validator';
 export class ItemController {
     constructor(private readonly itemService: ItemService) { }
 
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     @Post()
     @UseInterceptors(FileInterceptor('video'))
@@ -29,15 +30,23 @@ export class ItemController {
         return this.itemService.createItem(file, createItemDto, req.user['id']);
     }
 
-    @Get()
-    async getItems(@Query('collectionId') collectionId?: string) {
-        return this.itemService.getItems(collectionId);
+    @Get("public")
+    async getItems(@Query('page_no') page_no: number, @Query('collectionId') collectionId?: string) {
+        return this.itemService.getPublicItems(page_no, collectionId);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     @Get(':id')
-    async getItemById(@Param('id') id: string) {
-        return this.itemService.getItemById(id);
+    async getItemById(@Param('id') id: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.getItemById(id, req.user.id);
     }
+
+    @Get(':id/public')
+    async getItemByIdPublic(@Param('id') id: string) {
+        return this.itemService.getItemByIdPublic(id);
+    }
+
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard)

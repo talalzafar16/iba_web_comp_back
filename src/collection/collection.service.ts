@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Collection } from 'src/schemas/user_panel/collection.schema';
 import { CreateCollectionDto, UpdateCollectionDto } from './dtos/request_dtos/collection.dto';
+import { DEFAULT_LIMIT } from 'src/constants';
 
 @Injectable()
 export class CollectionService {
@@ -13,12 +14,16 @@ export class CollectionService {
     return newCollection.save();
   }
 
-  async getAllPublicCollections(): Promise<Collection[]> {
-    return this.collectionModel.find({ isPublic: true }).populate('creator', 'name').exec();
+  async getAllPublicCollections(page_no: number): Promise<Collection[]> {
+    const skip = (page_no - 1) * DEFAULT_LIMIT
+    return this.collectionModel.find({ isPublic: true }).skip(skip).limit(DEFAULT_LIMIT).populate([
+         { path: 'creator', select: 'name email profileImage' },
+    ]).exec();
   }
 
-  async getUserCollections(userId: string): Promise<Collection[]> {
-    return this.collectionModel.find({ creator: new Types.ObjectId(userId)}).exec();
+  async getUserCollections(userId: string, page_no: number): Promise<Collection[]> {
+    const skip = (page_no - 1) * DEFAULT_LIMIT
+    return this.collectionModel.find({ creator: new Types.ObjectId(userId)}).skip(skip).limit(DEFAULT_LIMIT).exec();
   }
 
   async getCollectionById(id: string, userId: string): Promise<Collection> {

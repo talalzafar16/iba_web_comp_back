@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
 import { CollectionService } from './collection.service';
 import { CreateCollectionDto, UpdateCollectionDto } from './dtos/request_dtos/collection.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -18,15 +18,15 @@ export class CollectionController {
   }
 
   @Get('public')
-  async getAllPublicCollections() {
-    return this.collectionService.getAllPublicCollections();
+  async getAllPublicCollections(@Query('page_no') page_no: number) {
+    return this.collectionService.getAllPublicCollections(page_no);
   }
 
   @Get('my')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  async getUserCollections(@Req() req: UserPayloadRequest) {
-    return this.collectionService.getUserCollections(req.user['id']);
+  async getUserCollections(@Req() req: UserPayloadRequest,@Query('page_no') page_no: number) {
+    return this.collectionService.getUserCollections(req.user['id'],page_no);
   }
 
   @Get(':id')
