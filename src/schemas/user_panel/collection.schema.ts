@@ -23,6 +23,9 @@ export class Collection extends Document {
   @Prop({ type: [String] })
   tags: string[];
 
+  @Prop({ required: true })
+  videoUrl: string; // Link to the cinematographic video (e.g., S3, CDN, or external source)
+
   @Prop({ type: Boolean, default: false })
   isPublic: boolean;
 

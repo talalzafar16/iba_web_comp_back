@@ -4,13 +4,24 @@ import { Model, Types } from 'mongoose';
 import { Collection } from 'src/schemas/user_panel/collection.schema';
 import { CreateCollectionDto, UpdateCollectionDto } from './dtos/request_dtos/collection.dto';
 import { DEFAULT_LIMIT } from 'src/constants';
+import { v4 as uuidv4 } from 'uuid';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class CollectionService {
-    constructor(@InjectModel(Collection.name) private collectionModel: Model<Collection>) { }
+    constructor(@InjectModel(Collection.name) private collectionModel: Model<Collection>,
+        private readonly firebaseService: FirebaseService
+               ) { }
 
-    async createCollection(createDto: CreateCollectionDto, userId: string): Promise<Collection> {
-        const newCollection = new this.collectionModel({ ...createDto, creator: new Types.ObjectId(userId) });
+    private readonly get_item_path = (user_id: string, file_name: string) => `cineverse/videos/${user_id}/collection_videos/${uuidv4()}/collectionVideo_${file_name}/`
+
+    async createCollection(createDto: CreateCollectionDto, userId: string, file: Express.Multer.File): Promise<Collection> {
+        if (!file) throw new NotFoundException('Video file is required');
+
+        const path = this.get_item_path(userId, file.filename)
+        const videoUrl = await this.firebaseService.uploadFile(file, path); // Upload video & get URL
+
+        const newCollection = new this.collectionModel({ ...createDto, creator: new Types.ObjectId(userId), videoUrl });
         return newCollection.save();
     }
 

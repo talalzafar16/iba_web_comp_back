@@ -1,9 +1,10 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards, Req, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { CollectionService } from './collection.service';
 import { CreateCollectionDto, GetPublicCollectionsDto, UpdateCollectionDto } from './dtos/request_dtos/collection.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { UserPayloadRequest } from 'src/commons/interfaces/user_payload_request.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('collections')
 @Controller('collections')
@@ -13,8 +14,16 @@ export class CollectionController {
     @Post()
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
-    async createCollection(@Body() createDto: CreateCollectionDto, @Req() req: UserPayloadRequest) {
-        return this.collectionService.createCollection(createDto, req.user['id']);
+    @UseInterceptors(FileInterceptor('video'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        description: 'Upload an collection along with a video file',
+        type: CreateCollectionDto,
+    })
+    async createCollection(@Body() createDto: CreateCollectionDto, @Req() req: UserPayloadRequest
+        ,@UploadedFile() file: Express.Multer.File,
+                          ) {
+        return this.collectionService.createCollection(createDto, req.user['id'], file);
     }
 
     @Get('/public')
