@@ -1,12 +1,6 @@
 import { IsString, IsOptional, IsBoolean, IsEnum, IsArray, ArrayMinSize, IsMongoId } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { PlanType } from 'src/schemas/user_panel/collection.schema';
 
-export enum PlanType {
-  BASIC = 'basic',
-  PREMIUM = 'premium',
-}
-
-// DTO for Creating a Collection
 export class CreateCollectionDto {
   @IsString()
   title: string;
@@ -25,13 +19,12 @@ export class CreateCollectionDto {
   @IsOptional()
   isPublic?: boolean;
 
-  @IsArray()
+  @IsString()
   @IsOptional()
   @IsEnum(PlanType, { each: true })
-  plan?: PlanType[];
+  plan?: PlanType;
 }
 
-// DTO for Updating a Collection
 export class UpdateCollectionDto {
   @IsOptional()
   @IsString()
@@ -50,21 +43,9 @@ export class UpdateCollectionDto {
   @IsBoolean()
   isPublic?: boolean;
 
-  @IsArray()
+  @IsString()
   @IsOptional()
   @IsEnum(PlanType, { each: true })
-  plan?: PlanType[];
-}
-
-// DTO for Response Transformation
-export class CollectionResponseDto {
-  @Transform(({ value }) => value.toString())
-  _id: string;
-
-  title: string;
-  description?: string;
-  tags?: string[];
-  isPublic: boolean;
-  plan?: PlanType[];
+  plan?: PlanType;
 }
 
