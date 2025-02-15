@@ -3,8 +3,10 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from 'src/auth/dtos/requestDtos/signup.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UserPayloadRequest } from 'src/commons/interfaces/user_payload_request.interface';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
