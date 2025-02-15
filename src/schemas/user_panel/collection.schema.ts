@@ -1,0 +1,38 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { User } from './user.schema';
+
+export enum PlanType {
+  BASIC = 'basic',
+  PREMIUM = 'premium',
+}
+
+@Schema({ timestamps: true })
+export class Collection extends Document {
+  @Prop({ required: true })
+  title: string;
+
+  @Prop()
+  description?: string;
+
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  creator: Types.ObjectId;
+
+  @Prop({ type: [String] })
+  tags: string[];
+
+  @Prop({ type: Boolean, default: false })
+  isPublic: boolean;
+
+  @Prop({ type: Number, default: 0 })
+  downloads: number;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
+  likes: Types.ObjectId[];
+
+  @Prop({ type: String, enum: PlanType })
+  plan: PlanType;
+}
+
+export const CollectionSchema = SchemaFactory.createForClass(Collection);
+

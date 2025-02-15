@@ -14,6 +14,7 @@ import { User, UserSchema } from './schemas/user_panel/user.schema';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NgoController } from './ngo/ngo.controller';
 import { NgoModule } from './ngo/ngo.module';
+import { CollectionModule } from './collection/collection.module';
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import { NgoModule } from './ngo/ngo.module';
         NotificationsModule,
         UserModule,
         NgoModule,
+        CollectionModule,
     ],
     controllers: [AppController, AuthController, NgoController],
     providers: [
