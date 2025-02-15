@@ -45,6 +45,9 @@ export class ItemService {
             const path = this.get_item_path(collection._id.toString(), userId, file.filename, false)
             const marked_file = fs.readFileSync(tempOutputPath)
             watermarkedVideoUrl = await this.firebaseService.uploadBuffer(marked_file, path); // Upload video & get URL
+
+            fs.unlinkSync(tempInputPath)
+            fs.unlinkSync(tempOutputPath)
         }
 
         const path = this.get_item_path(collection._id.toString(), userId, file.filename, true)
