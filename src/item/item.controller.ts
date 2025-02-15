@@ -6,11 +6,43 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiBody, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserPayloadRequest } from 'src/commons/interfaces/user_payload_request.interface';
 import { isArray } from 'class-validator';
+import { SecurityLevel, SecurityLevelDec } from 'src/auth/security.decorator';
 
 @ApiTags('Items')
 @Controller('items')
 export class ItemController {
     constructor(private readonly itemService: ItemService) { }
+
+
+    @SecurityLevelDec(SecurityLevel.LOW)
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Get("public")
+    async getItems(@Query('page_no') page_no: number, @Req() req: UserPayloadRequest, @Query('collectionId') collectionId?: string) {
+        return this.itemService.getPublicItems(page_no, req?.user?.id, collectionId);
+    }
+
+    @SecurityLevelDec(SecurityLevel.LOW)
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Get(':id/public')
+    async getItemByIdPublic(@Param('id') id: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.getItemByIdPublic(id, req?.user?.id);
+    }
+
+    @SecurityLevelDec(SecurityLevel.LOW)
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    @Get('get_items_by_collection_and_user_id')
+    async get_items_by_collection_id_user_id(@Query('collection_id') collectionId: string, @Query('user_id') user_id: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.getItemByColIdUserId(collectionId, user_id, req?.user?.id);
+    }
+
+    @Patch(':id/download')
+    async incrementDownloads(@Param('id') id: string) {
+        return this.itemService.incrementDownloads(id);
+    }
+
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard)
@@ -30,10 +62,6 @@ export class ItemController {
         return this.itemService.createItem(file, createItemDto, req.user['id']);
     }
 
-    @Get("public")
-    async getItems(@Query('page_no') page_no: number, @Query('collectionId') collectionId?: string) {
-        return this.itemService.getPublicItems(page_no, collectionId);
-    }
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard)
@@ -46,21 +74,9 @@ export class ItemController {
     @UseGuards(AuthGuard)
     @Get('get_my_items_by_collection_id')
     async get_my_items_by_collection_id(@Query('collection_id') collectionId: string, @Req() req: UserPayloadRequest) {
-        return this.itemService.getItemById(collectionId, req.user.id);
+        return this.itemService.getMyItemByColId(collectionId, req.user.id);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Get('get_items_by_collection_and_user_id')
-    async get_items_by_collection_id_user_id(@Query('collection_id') collectionId: string, @Query('user_id') user_id: string) {
-        return this.itemService.getItemById(collectionId, user_id);
-    }
-
-
-    @Get(':id/public')
-    async getItemByIdPublic(@Param('id') id: string) {
-        return this.itemService.getItemByIdPublic(id);
-    }
 
 
     @ApiBearerAuth()
@@ -84,10 +100,5 @@ export class ItemController {
         return this.itemService.toggleLikeItem(id, req.user.id);
     }
 
-
-    @Patch(':id/download')
-    async incrementDownloads(@Param('id') id: string) {
-        return this.itemService.incrementDownloads(id);
-    }
 }
 

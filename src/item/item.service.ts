@@ -10,13 +10,15 @@ import { Collection, CollectionDocument, PlanType } from 'src/schemas/user_panel
 import { FirebaseService } from '../firebase/firebase.service';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_LIMIT } from 'src/constants';
-import { PassThrough } from 'stream';
+import { Payment, PaymentDocument } from 'src/schemas/user_panel/payment.schema';
+import { PaymentStatus } from 'src/payment/dtos/request_dtos/payment.dto';
 
 @Injectable()
 export class ItemService {
     constructor(
         @InjectModel(Item.name) private readonly itemModel: Model<ItemDocument>,
         @InjectModel(Collection.name) private readonly collectionModel: Model<CollectionDocument>,
+        @InjectModel(Payment.name) private readonly paymenyModel: Model<PaymentDocument>,
         private readonly firebaseService: FirebaseService
     ) { }
 
@@ -80,7 +82,7 @@ export class ItemService {
         return this.itemModel.find(query).populate('creator', 'name').exec();
     }
 
-    async getPublicItems(page_no: number, collectionId?: string): Promise<Item[]> {
+    async getPublicItems(page_no: number, user_id: string, collectionId?: string): Promise<any[]> {
 
         let query;
         if (collectionId) {
@@ -94,7 +96,30 @@ export class ItemService {
             query = { parent_collection: { $in: collection_ids } }
         }
         const skip = (page_no - 1) * DEFAULT_LIMIT
-        return this.itemModel.find(query).skip(skip).limit(DEFAULT_LIMIT).populate('creator', 'name').exec();
+        const items = await this.itemModel.find(query).skip(skip).limit(DEFAULT_LIMIT).populate('creator', 'name').exec();
+
+        let filtered_items = []
+
+        for (const item of items) {
+            if (item.plan === PlanType.BASIC) {
+                filtered_items.push(item)
+            } else {
+                if (user_id) {
+                    const payment = await this.paymenyModel.findOne({ buyer: new Types.ObjectId(user_id), item: item._id, status: PaymentStatus.COMPLETED })
+                    if (payment || (user_id === item?.creator?._id?.toString())) {
+                        filtered_items.push(item)
+                    } else {
+                        const { videoUrl, ...rest } = item.toObject();
+                        filtered_items.push(rest)
+                    }
+                } else {
+                    const { videoUrl, ...rest } = item.toObject();
+                    filtered_items.push(rest)
+                }
+            }
+        };
+
+        return filtered_items;
     }
 
 
@@ -111,11 +136,34 @@ export class ItemService {
         return items;
     }
 
-    async getItemByColIdUserId(collectionId: string, user_id: string): Promise<Item[]> {
+    async getItemByColIdUserId(collectionId: string, user_id: string, access_user_id: string): Promise<any[]> {
         const col = await this.collectionModel.findById(collectionId)
         if (!col.isPublic) throw new BadRequestException("Collection is private")
         const items = await this.itemModel.find({ parent_collection: new Types.ObjectId(collectionId), creator: new Types.ObjectId(user_id) }).populate('creator', 'name');
-        return items;
+
+        let filtered_items = []
+
+        for (const item of items) {
+            if (item.plan === PlanType.BASIC) {
+                filtered_items.push(item)
+            } else {
+                if (access_user_id) {
+                    const payment = await this.paymenyModel.findOne({ buyer: new Types.ObjectId(user_id), item: item._id, status: PaymentStatus.COMPLETED })
+                    if (payment || (access_user_id === item?.creator?._id?.toString())) {
+                        filtered_items.push(item)
+                    } else {
+                        const { videoUrl, ...rest } = item.toObject();
+                        filtered_items.push(rest)
+                    }
+                } else {
+                    const { videoUrl, ...rest } = item.toObject();
+                    filtered_items.push(rest)
+                }
+            }
+        };
+
+        return filtered_items;
+
     }
 
 
@@ -125,13 +173,22 @@ export class ItemService {
     }
 
 
-    async getItemByIdPublic(id: string): Promise<Item> {
+    async getItemByIdPublic(id: string, user_id: string | undefined): Promise<any> {
         const item = await this.itemModel.findById(id).populate('creator', 'name');
         if (!item) throw new NotFoundException('Item not found');
 
         const col = await this.collectionModel.findById(item.parent_collection)
         if (!col.isPublic) throw new BadRequestException("Public item not found")
-        return item;
+
+        if (item.plan === PlanType.BASIC) return item
+
+        if (user_id) {
+            const payment = await this.paymenyModel.findOne({ buyer: new Types.ObjectId(user_id), item: item._id, status: PaymentStatus.COMPLETED })
+            if (payment || (user_id === item?.creator?._id?.toString())) return item
+        }
+        const { videoUrl, ...rest } = item.toObject();
+        return rest;
+
     }
 
     async updateItem(id: string, updateItemDto: UpdateItemDto, userId: string): Promise<Item> {
