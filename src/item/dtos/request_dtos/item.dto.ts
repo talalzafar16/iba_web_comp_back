@@ -1,5 +1,6 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray, IsMongoId } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsArray, IsMongoId, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { PlanType } from 'src/schemas/user_panel/collection.schema';
 
 export class CreateItemDto {
   @ApiProperty()
@@ -30,6 +31,13 @@ export class CreateItemDto {
     description: 'Video file to upload' 
   })
   video: Express.Multer.File
+
+
+  @IsString()
+  @IsOptional()
+  @IsEnum(PlanType, { each: true })
+  plan?: PlanType;
+
 }
 
 export class UpdateItemDto {
@@ -48,5 +56,10 @@ export class UpdateItemDto {
   @IsOptional()
   @IsString({ each: true })
   tags?: string[];
+
+//  @IsString()
+//  @IsOptional()
+//  @IsEnum(PlanType, { each: true })
+//  plan?: PlanType;
 }
 

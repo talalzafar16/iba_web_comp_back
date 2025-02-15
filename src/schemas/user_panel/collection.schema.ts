@@ -32,8 +32,6 @@ export class Collection extends Document {
   @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
   likes: Types.ObjectId[];
 
-  @Prop({ type: String, enum: PlanType })
-  plan: PlanType;
 }
 
 export const CollectionSchema = SchemaFactory.createForClass(Collection);

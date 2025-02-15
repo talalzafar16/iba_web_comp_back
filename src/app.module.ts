@@ -16,6 +16,7 @@ import { NgoController } from './ngo/ngo.controller';
 import { NgoModule } from './ngo/ngo.module';
 import { CollectionModule } from './collection/collection.module';
 import { ItemModule } from './item/item.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { ItemModule } from './item/item.module';
         NgoModule,
         CollectionModule,
         ItemModule,
+        PaymentModule,
     ],
     controllers: [AppController, AuthController, NgoController],
     providers: [

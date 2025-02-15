@@ -1,5 +1,4 @@
 import { Transform } from "class-transformer";
-import { PlanType } from "src/schemas/user_panel/collection.schema";
 
 export class CollectionResponseDto {
   @Transform(({ value }) => value.toString())
@@ -9,6 +8,5 @@ export class CollectionResponseDto {
   description?: string;
   tags?: string[];
   isPublic: boolean;
-  plan?: PlanType[];
 }
 

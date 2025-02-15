@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
 import { User } from './user.schema';
 import { HydratedDocument } from 'mongoose';
+import { PlanType } from './collection.schema';
 
 export type ItemDocument = HydratedDocument<Item>;
 
@@ -12,6 +13,9 @@ export class Item extends Document {
 
   @Prop({ required: true })
   videoUrl: string; // Link to the cinematographic video (e.g., S3, CDN, or external source)
+
+  @Prop({ required: true })
+  watermarkedVideoUrl: string;
 
   @Prop()
   description?: string;
@@ -33,6 +37,9 @@ export class Item extends Document {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
   likes: Types.ObjectId[]; // Users who liked this item
+
+  @Prop({ type: String, enum: PlanType })
+  plan: PlanType;
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

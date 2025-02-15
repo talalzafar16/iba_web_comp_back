@@ -1,5 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsEnum, IsArray, ArrayMinSize, IsMongoId } from 'class-validator';
-import { PlanType } from 'src/schemas/user_panel/collection.schema';
+import { IsString, IsOptional, IsBoolean, IsEnum, IsArray, ArrayMinSize } from 'class-validator';
 
 export class CreateCollectionDto {
   @IsString()
@@ -19,10 +18,6 @@ export class CreateCollectionDto {
   @IsOptional()
   isPublic?: boolean;
 
-  @IsString()
-  @IsOptional()
-  @IsEnum(PlanType, { each: true })
-  plan?: PlanType;
 }
 
 export class UpdateCollectionDto {
@@ -43,10 +38,6 @@ export class UpdateCollectionDto {
   @IsBoolean()
   isPublic?: boolean;
 
-  @IsString()
-  @IsOptional()
-  @IsEnum(PlanType, { each: true })
-  plan?: PlanType;
 }
 
 

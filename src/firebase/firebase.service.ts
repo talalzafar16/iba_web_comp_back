@@ -32,4 +32,20 @@ export class FirebaseService {
         return url;
     }
 
+    async uploadBuffer(file: Buffer<any>, path : string): Promise<string> {
+        const fileUpload = this.bucket.file(path);
+
+        await fileUpload.save(file, {
+            metadata: { contentType: "video/mp4" },
+        });
+
+        const [url] = await fileUpload.getSignedUrl({
+            action: 'read',
+            expires: '03-01-2030',
+        });
+
+        return url;
+    }
+
+
 }

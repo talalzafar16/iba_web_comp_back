@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import * as fs from 'fs';
+const path = require("path")
+import * as ffmpeg from 'fluent-ffmpeg';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Item, ItemDocument } from 'src/schemas/user_panel/items.schema';
 import { CreateItemDto, UpdateItemDto } from './dtos/request_dtos/item.dto';
-import { Collection, CollectionDocument } from 'src/schemas/user_panel/collection.schema';
+import { Collection, CollectionDocument, PlanType } from 'src/schemas/user_panel/collection.schema';
 import { FirebaseService } from '../firebase/firebase.service';
 import { v4 as uuidv4 } from 'uuid';
 import { DEFAULT_LIMIT } from 'src/constants';
+import { PassThrough } from 'stream';
 
 @Injectable()
 export class ItemService {
@@ -16,7 +20,7 @@ export class ItemService {
         private readonly firebaseService: FirebaseService
     ) { }
 
-    private readonly get_item_path = (collection_id: string, user_id: string, file_name: string) => `cineverse/videos/${user_id}/${collection_id}/${uuidv4()}_${file_name}/`
+    private readonly get_item_path = (collection_id: string, user_id: string, file_name: string, normal: boolean) => `cineverse/videos/${user_id}/${collection_id}/${uuidv4()}_${file_name}_${normal ? "normal" : "watermarked"}/`
 
     async createItem(file: Express.Multer.File, createItemDto: CreateItemDto, userId: string): Promise<Item> {
         if (!file) throw new NotFoundException('Video file is required');
@@ -28,11 +32,44 @@ export class ItemService {
             throw new ForbiddenException('You are not allowed to add items to this collection');
         }
 
-        const path = this.get_item_path(collection._id.toString(), userId, file.filename)
+        let watermarkedVideoUrl
+        if (createItemDto.plan === PlanType.PREMIUM) {
+
+            const tempInputPath = `${uuidv4()}.mp4`;
+            const tempOutputPath = `${uuidv4()}.mp4`;
+
+            fs.writeFileSync(tempInputPath, file.buffer)
+
+            await this.addWatermark(tempInputPath, tempOutputPath);
+
+            const path = this.get_item_path(collection._id.toString(), userId, file.filename, false)
+            const marked_file = fs.readFileSync(tempOutputPath)
+            watermarkedVideoUrl = await this.firebaseService.uploadBuffer(marked_file, path); // Upload video & get URL
+        }
+
+        const path = this.get_item_path(collection._id.toString(), userId, file.filename, true)
         const videoUrl = await this.firebaseService.uploadFile(file, path); // Upload video & get URL
-        const newItem = new this.itemModel({ ...createItemDto, creator: userId, videoUrl });
+        const newItem = new this.itemModel({ ...createItemDto, creator: userId, videoUrl, watermarkedVideoUrl });
 
         return newItem.save();
+    }
+
+    private async addWatermark(filePath: string, outputPath: string) {
+        return new Promise((resolve, reject) => {
+            new ffmpeg(filePath)
+                .videoFilters("drawtext=text='Preview Only':" +
+                    "fontfile=/path/to/font.ttf:" + // Provide a bold font file path
+                    "fontsize=264:" + // Increase the font size
+                    "fontcolor=white:" +
+                    "x=(w-text_w)/2:" + // Center horizontally
+                    "y=(h-text_h)/2:" + // Center vertically
+                    "shadowcolor=black:" + // Add a shadow for visibility
+                    "shadowx=2:shadowy=2")
+                .output(outputPath)
+                .on("end", resolve)
+                .on("error", reject)
+                .run();
+        });
     }
 
     async getItems(collectionId?: string): Promise<Item[]> {
@@ -102,13 +139,13 @@ export class ItemService {
         const item = await this.itemModel.findById(itemId);
         if (!item) throw new NotFoundException('Item not found');
 
-        const userIndex = item.likes.map(u=> u.toString()).indexOf(userId);
+        const userIndex = item.likes.map(u => u.toString()).indexOf(userId);
         if (userIndex === -1) {
-            item.likes.push(new Types.ObjectId(userId)); 
+            item.likes.push(new Types.ObjectId(userId));
             await item.save();
             return { message: 'Item liked' };
         } else {
-            item.likes.splice(userIndex, 1); 
+            item.likes.splice(userIndex, 1);
             await item.save();
             return { message: 'Item unliked' };
         }
@@ -118,7 +155,7 @@ export class ItemService {
         const item = await this.itemModel.findById(itemId);
         if (!item) throw new NotFoundException('item not found');
 
-        item.downloads += 1; 
+        item.downloads += 1;
         await item.save();
 
         return { message: 'Download count updated' };
