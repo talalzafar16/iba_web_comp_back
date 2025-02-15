@@ -105,6 +105,20 @@ export class ItemService {
         return item;
     }
 
+
+    async getMyItemByColId(collectionId: string, user_id: string): Promise<Item[]> {
+        const items = await this.itemModel.find({ parent_collection: new Types.ObjectId(collectionId), creator: new Types.ObjectId(user_id) }).populate('creator', 'name');
+        return items;
+    }
+
+    async getItemByColIdUserId(collectionId: string, user_id: string): Promise<Item[]> {
+        const col = await this.collectionModel.findById(collectionId)
+        if (!col.isPublic) throw new BadRequestException("Collection is private")
+        const items = await this.itemModel.find({ parent_collection: new Types.ObjectId(collectionId), creator: new Types.ObjectId(user_id) }).populate('creator', 'name');
+        return items;
+    }
+
+
     async findById(id: string): Promise<Item> {
         const item = await this.itemModel.findById(id)
         return item;

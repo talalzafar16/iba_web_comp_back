@@ -42,6 +42,21 @@ export class ItemController {
         return this.itemService.getItemById(id, req.user.id);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Get('get_my_items_by_collection_id')
+    async get_my_items_by_collection_id(@Query('collection_id') collectionId: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.getItemById(collectionId, req.user.id);
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Get('get_items_by_collection_and_user_id')
+    async get_items_by_collection_id_user_id(@Query('collection_id') collectionId: string, @Query('user_id') user_id: string) {
+        return this.itemService.getItemById(collectionId, user_id);
+    }
+
+
     @Get(':id/public')
     async getItemByIdPublic(@Param('id') id: string) {
         return this.itemService.getItemByIdPublic(id);

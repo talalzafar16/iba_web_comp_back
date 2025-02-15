@@ -66,7 +66,7 @@ export class CollectionController {
         return this.collectionService.toggleLikeCollection(id, req.user.id);
     }
 
-    @Patch(':id/download')
+    @Patch(':id/increment_download')
     async incrementDownloads(@Param('id') id: string) {
         return this.collectionService.incrementDownloads(id);
     }
