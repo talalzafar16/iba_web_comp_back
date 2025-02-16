@@ -12,6 +12,20 @@ export class CollectionController {
     constructor(private readonly collectionService: CollectionService) { }
 
 
+
+
+    @Get('user_id')
+    async getUserCollectionsOfUser(@Query("user_id") user_id: string, @Query('page_no') page_no: number) {
+        return this.collectionService.getUserCollectionsPublic(user_id, page_no);
+    }
+
+
+
+
+
+
+
+
     @Get('getLikedCollections')
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
@@ -93,6 +107,9 @@ export class CollectionController {
     async incrementDownloads(@Param('id') id: string) {
         return this.collectionService.incrementDownloads(id);
     }
+
+
+
 
 
 

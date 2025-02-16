@@ -63,6 +63,14 @@ export class CollectionService {
     }
 
 
+
+    async getUserCollectionsPublic(userId: string, page_no: number): Promise<Collection[]> {
+        const skip = (page_no - 1) * DEFAULT_LIMIT
+        return this.collectionModel.find({ creator: new Types.ObjectId(userId), isPublic: true }).skip(skip).limit(DEFAULT_LIMIT).exec();
+    }
+
+
+
     async getCollectionByIdPublic(id: string): Promise<Collection> {
         const collection = await this.collectionModel.findById(id).exec();
         if (!collection) throw new NotFoundException('Collection not found');
