@@ -54,6 +54,17 @@ export class ItemController {
 
     @ApiBearerAuth()
     @UseGuards(AuthGuard)
+    @Get('get_my_items_by_collection_id')
+    async get_my_items_by_collection_id(@Query('collection_id') collectionId: string, @Req() req: UserPayloadRequest) {
+        return this.itemService.getMyItemByColId(collectionId, req.user.id);
+    }
+
+
+
+
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     @Post()
     @UseInterceptors(FileInterceptor('video'))
     @ApiConsumes('multipart/form-data')
@@ -78,12 +89,9 @@ export class ItemController {
         return this.itemService.getItemById(id, req.user.id);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Get('get_my_items_by_collection_id')
-    async get_my_items_by_collection_id(@Query('collection_id') collectionId: string, @Req() req: UserPayloadRequest) {
-        return this.itemService.getMyItemByColId(collectionId, req.user.id);
-    }
+
+
+
 
 
 
