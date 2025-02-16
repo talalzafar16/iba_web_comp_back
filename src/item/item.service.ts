@@ -240,6 +240,10 @@ export class ItemService {
         return { message: 'Download count updated' };
     }
 
+    async getLikedItems(userId: string) {
+        console.log("hello")
+        return this.itemModel.find({ likes: new Types.ObjectId(userId) }).exec();
+    }
 
 }
 

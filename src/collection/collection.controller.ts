@@ -11,6 +11,17 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class CollectionController {
     constructor(private readonly collectionService: CollectionService) { }
 
+
+    @Get('getLikedCollections')
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    async getLikedCollections(@Req() req: UserPayloadRequest) {
+        const userId = req.user.id;
+        return this.collectionService.getLikedCollections(userId);
+    }
+
+
+
     @Post()
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
@@ -21,8 +32,8 @@ export class CollectionController {
         type: CreateCollectionDto,
     })
     async createCollection(@Body() createDto: CreateCollectionDto, @Req() req: UserPayloadRequest
-        ,@UploadedFile() file: Express.Multer.File,
-                          ) {
+        , @UploadedFile() file: Express.Multer.File,
+    ) {
         return this.collectionService.createCollection(createDto, req.user['id'], file);
     }
 
@@ -75,10 +86,15 @@ export class CollectionController {
         return this.collectionService.toggleLikeCollection(id, req.user.id);
     }
 
+
+
+
     @Patch(':id/increment_download')
     async incrementDownloads(@Param('id') id: string) {
         return this.collectionService.incrementDownloads(id);
     }
+
+
 
 
 }

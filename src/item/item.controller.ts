@@ -13,6 +13,14 @@ import { SecurityLevel, SecurityLevelDec } from 'src/auth/security.decorator';
 export class ItemController {
     constructor(private readonly itemService: ItemService) { }
 
+    @Get('getLikedItems')
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
+    async getLikedCollections(@Req() req: UserPayloadRequest) {
+        const userId = req.user.id;
+        return this.itemService.getLikedItems(userId);
+    }
+
 
     @SecurityLevelDec(SecurityLevel.LOW)
     @UseGuards(AuthGuard)
@@ -99,6 +107,11 @@ export class ItemController {
     async toggleLikeItem(@Param('id') id: string, @Req() req: UserPayloadRequest) {
         return this.itemService.toggleLikeItem(id, req.user.id);
     }
+
+
+
+
+
 
 }
 

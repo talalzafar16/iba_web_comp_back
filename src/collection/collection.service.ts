@@ -11,7 +11,7 @@ import { FirebaseService } from 'src/firebase/firebase.service';
 export class CollectionService {
     constructor(@InjectModel(Collection.name) private collectionModel: Model<Collection>,
         private readonly firebaseService: FirebaseService
-               ) { }
+    ) { }
 
     private readonly get_item_path = (user_id: string, file_name: string) => `cineverse/videos/${user_id}/collection_videos/${uuidv4()}/collectionVideo_${file_name}/`
 
@@ -133,6 +133,11 @@ export class CollectionService {
         await collection.save();
 
         return { message: 'Download count updated' };
+    }
+
+    async getLikedCollections(userId: string) {
+        console.log("hello")
+        return this.collectionModel.find({ likes: new Types.ObjectId(userId) }).exec();
     }
 
 

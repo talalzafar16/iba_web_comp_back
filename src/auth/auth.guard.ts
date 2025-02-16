@@ -24,6 +24,7 @@ export class AuthGuard implements CanActivate {
 
 
         const token = this.extractTokenFromHeader(request);
+        console.log(request.headers)
 
         if (security_level === SecurityLevel.LOW) {
             if (token) {
