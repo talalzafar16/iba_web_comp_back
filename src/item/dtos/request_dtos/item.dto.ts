@@ -1,6 +1,11 @@
 import { IsString, IsNotEmpty, IsOptional, IsArray, IsMongoId, IsEnum, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PlanType } from 'src/schemas/user_panel/collection.schema';
+import { Transform } from 'class-transformer';
+
+export function ParseToInt() {
+    return Transform(({ value }) => (value && typeof value == 'string' ? parseInt(value) : value));
+}
 
 export class CreateItemDto {
     @ApiProperty()
@@ -39,7 +44,7 @@ export class CreateItemDto {
     plan?: PlanType;
 
 
-    @IsNumber()
+    @ParseToInt()
     @IsOptional()
     price?: number
 }
