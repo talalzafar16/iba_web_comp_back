@@ -28,7 +28,7 @@ export class PaymentController {
     @Post('webhook')
     async handleWebhook(@Req() req: Request) {
         const sig = req.headers['stripe-signature'];
-        const webhookSecret = "whsec_04296f282601780280f03f1ed84aaf759f54af5d5f17a236e2a06528f520d2f2";
+        const webhookSecret = "whsec_ywuOHed7GKJ0Wx3x7OM8Gl8hMRm5o1a5";
 
         let event;
         try {
