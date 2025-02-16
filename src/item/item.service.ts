@@ -54,7 +54,7 @@ export class ItemService {
 
         const path = this.get_item_path(collection._id.toString(), userId, file.filename, true)
         const videoUrl = await this.firebaseService.uploadFile(file, path); // Upload video & get URL
-        const newItem = new this.itemModel({ ...createItemDto, creator: userId, videoUrl, watermarkedVideoUrl });
+        const newItem = new this.itemModel({ ...createItemDto, creator:new Types.ObjectId(userId), videoUrl, watermarkedVideoUrl });
 
         return newItem.save();
     }
@@ -134,7 +134,7 @@ export class ItemService {
     async getMyItemByColId(collectionId: string, user_id: string): Promise<Item[]> {
 
         console.log(collectionId, user_id)
-        const items = await this.itemModel.find({ parent_collection: new Types.ObjectId(collectionId), creator: new Types.ObjectId(user_id) }).populate('creator', 'name');
+        const items = await this.itemModel.find({ parent_collection: new Types.ObjectId(collectionId), creator:new Types.ObjectId(user_id) }).populate('creator', 'name');
         return items;
     }
 
