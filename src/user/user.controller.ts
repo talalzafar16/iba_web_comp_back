@@ -15,6 +15,12 @@ export class UserController {
     }
 
 
+    @Get("cinematographers")
+    async get_all_cine() {
+        return this.userService.get_all_cinematographers();
+    }
+
+
     @Get("get_one_by_id")
     async get_user_by_id(@Query("user_id") id: string) {
         return this.userService.find_by_id(id);
