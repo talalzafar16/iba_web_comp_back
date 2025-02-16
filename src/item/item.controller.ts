@@ -13,6 +13,34 @@ import { SecurityLevel, SecurityLevelDec } from 'src/auth/security.decorator';
 export class ItemController {
     constructor(private readonly itemService: ItemService) { }
 
+
+
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Post()
+    @UseInterceptors(FileInterceptor('video'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        description: 'Upload an item along with a video file',
+        type: CreateItemDto,
+    })
+    async createItem(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() createItemDto: CreateItemDto,
+        @Req() req: UserPayloadRequest
+    ) {
+        createItemDto.tags = !isArray(createItemDto) ? (createItemDto.tags as string)?.split(",") : createItemDto.tags
+        return this.itemService.createItem(file, createItemDto, req.user['id']);
+    }
+
+
+
+
+
+
+
+
     @Get('getLikedItems')
     @UseGuards(AuthGuard)
     @ApiBearerAuth()
@@ -63,23 +91,6 @@ export class ItemController {
 
 
 
-    @ApiBearerAuth()
-    @UseGuards(AuthGuard)
-    @Post()
-    @UseInterceptors(FileInterceptor('video'))
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({
-        description: 'Upload an item along with a video file',
-        type: CreateItemDto,
-    })
-    async createItem(
-        @UploadedFile() file: Express.Multer.File,
-        @Body() createItemDto: CreateItemDto,
-        @Req() req: UserPayloadRequest
-    ) {
-        createItemDto.tags = !isArray(createItemDto) ? (createItemDto.tags as string)?.split(",") : createItemDto.tags
-        return this.itemService.createItem(file, createItemDto, req.user['id']);
-    }
 
 
     @ApiBearerAuth()

@@ -54,6 +54,10 @@ export class ItemService {
 
         const path = this.get_item_path(collection._id.toString(), userId, file.filename, true)
         const videoUrl = await this.firebaseService.uploadFile(file, path); // Upload video & get URL
+
+       if (!watermarkedVideoUrl) {
+           watermarkedVideoUrl = "N/A"
+       } 
         const newItem = new this.itemModel({ ...createItemDto, creator:new Types.ObjectId(userId), videoUrl, watermarkedVideoUrl });
 
         return newItem.save();
